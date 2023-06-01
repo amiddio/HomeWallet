@@ -1,5 +1,10 @@
+from models.scheme import init_db
+from widgets.app import App
+
+
 def main():
-    pass
+    init_db()
+    App().mainloop()
 
 
 if __name__ == '__main__':
