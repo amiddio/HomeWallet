@@ -1,16 +1,9 @@
-import calendar
 import datetime as dt
 import helper as hlp
 
-
 from enum import Enum
-from typing import Callable, Iterable
-
 from sqlalchemy import desc, and_
 from typing_extensions import Self, Type
-
-from lang_pack.lang import LANG_GENERAL
-from logger.logger import log
 from models.base_model import BaseModel
 from models.scheme import ValueOrm, TypeEnum
 from models.tag_model import TagModel
@@ -89,7 +82,17 @@ class ValueModel(BaseModel):
         return [ValueModel(orm=orm) for orm in values]
 
     @staticmethod
-    def get_all_filtered(date_from: tuple, date_to: tuple, tags: list):
+    def get_current_month() -> list[Self]:
+        date_from = date_to = (dt.datetime.now().year, dt.datetime.now().month)
+        return ValueModel.get_all_filtered(date_from, date_to)
+
+    @staticmethod
+    def get_last_month() -> list[Self]:
+        date_from = date_to = hlp.get_last_month()
+        return ValueModel.get_all_filtered(date_from, date_to)
+
+    @staticmethod
+    def get_all_filtered(date_from: tuple, date_to: tuple, tags: list = None):
         start_date, end_date = hlp.prepare_filter_dates(date_from, date_to)
         values = ValueOrm.get_all(
             filter_=[ValueOrm.date <= start_date, ValueOrm.date >= end_date],
@@ -99,22 +102,8 @@ class ValueModel(BaseModel):
         return [ValueModel(orm=orm) for orm in values]
 
     @staticmethod
-    def date_formated(dt):
-        return dt.strftime('%d %B, %Y')
-
-    def display_price(self, price):
-        if not price:
-            return ''
-        price = "{:.2f}".format(price)
-        if self.orm.type == TypeEnum.VOUT:
-            return f"-{price}"
-        return price
-
-    @staticmethod
     def get_years_range():
         years = ValueOrm.get_years_range()
         if years:
             years = [y[0] for y in years]
         return years
-
-

@@ -2,11 +2,9 @@ import tkinter as tk
 
 from tkinter import ttk
 from tkinter.ttk import Frame
-from typing import Callable
 from config_data.config import load_config, Config
 from widgets.menu import Menu
-from widgets.tags import Tags
-from widgets.values import Values
+from widgets.values import Values, ViewMonth
 
 
 class App(tk.Tk):
@@ -29,8 +27,7 @@ class App(tk.Tk):
         App._window_styling()
 
         Menu(self)
-        #Tags(self)
-        Values(self)
+        Values(self, view_month=ViewMonth.CURRENT)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Public methods
@@ -50,18 +47,6 @@ class App(tk.Tk):
             container.grid_columnconfigure(index, weight=weight)
         return container
 
-    # def get_page_header(self, master: tk, title: str,
-    #                     btn_text: str = None, bg_color: str = None, btn_callback: Callable = None) -> ttk.Button | None:
-    #     container = self.get_container_frame(master, columns=[10, 1], background=bg_color)
-    #     tk.Label(container, text=title, font=("Calibri", 16, 'bold'), background=bg_color) \
-    #         .grid(row=0, column=0, sticky="w", padx=15, pady=10)
-    #     if btn_text:
-    #         btn = ttk.Button(container, style='Manage.TButton', text=btn_text)
-    #         btn.configure(command=btn_callback)
-    #         btn.grid(row=0, column=1, sticky="e", padx=15, pady=10)
-    #         return btn
-    #     return
-
     def get_page_header(self, master: tk, title: str,
                         btn_text: str = None, bg_color: str = None) -> ttk.Button | None:
         container = self.get_container_frame(master, columns=[10, 1], background=bg_color)
@@ -72,12 +57,6 @@ class App(tk.Tk):
             btn.grid(row=0, column=1, sticky="e", padx=15, pady=10)
             return btn
         return
-
-    # def get_filter_header(self, master: tk):
-    #     container = self.get_container_frame(master, columns=[10, 1])
-    #     btn = ttk.Button(container, style='Manage.TButton', text="Filter", command=None)
-    #     btn.grid(row=0, column=1, sticky="e", padx=15, pady=10)
-    #     return btn
 
     def close_popup_action(self, popup, btn):
 

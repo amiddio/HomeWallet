@@ -171,5 +171,3 @@ class Tags:
         except Exception as e:
             log().error(e)
             mb.showerror(LANG_GENERAL["internal error"], str(e))
-
-

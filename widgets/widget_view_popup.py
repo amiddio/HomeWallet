@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.messagebox as mb
+import helper as hlp
 
 from tkinter.scrolledtext import ScrolledText
 from lang_pack.lang import LANG_GENERAL, LANG_COLORS, LANG_MSG
@@ -49,9 +50,9 @@ class WidgetViewPopup:
         :return: None
         """
 
-        gel = LANG_GENERAL["gel"].format(price=self.value.display_price(self.value.get().price_gel))
-        usd = LANG_GENERAL["usd"].format(price=self.value.display_price(self.value.get().price_gel))
-        dt = ValueModel.date_formated(self.value.get().date)
+        gel = LANG_GENERAL["gel"].format(price=hlp.display_price(self.value.get().price_gel, self.value.get().type))
+        usd = LANG_GENERAL["usd"].format(price=hlp.display_price(self.value.get().price_usd, self.value.get().type))
+        dt = hlp.date_formated(self.value.get().date)
         tags = LANG_GENERAL["tags"] + ': ' + ', '.join([tag.name for tag in self.value.get().tags])
         price_fg = LANG_COLORS["price_red"] if self.value.get().type == TypeEnum.VOUT else LANG_COLORS["price_green"]
 

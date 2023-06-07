@@ -1,9 +1,5 @@
 import tkinter as tk
 
-from tkinter.scrolledtext import ScrolledText
-
-from lang_pack.lang import LANG_GENERAL
-
 
 class WidgetSelectboxFormRow:
 

@@ -4,12 +4,33 @@ import datetime as dt
 
 from datetime import datetime
 from logger.logger import log
+from models.scheme import TypeEnum, ValueOrm
 from models.tag_model import TagModel
 from models.value_model import ValueModel
 
 
-def prepare_filter_dates(from_date: tuple, to_date: tuple) -> tuple:
+def date_formated(dt):
+    return dt.strftime('%d %B, %Y')
 
+def get_last_month():
+    previous_year = datetime.now().year
+    previous_month = datetime.now().month - 1
+    if previous_month == 0:
+        previous_month = 12
+        previous_year -= 1
+
+    return previous_year, previous_month
+
+def display_price(price, type_=None):
+    if not price:
+        return ''
+    price = "{:,.2f}".format(price)
+    if type_ == TypeEnum.VOUT:
+        return f"-{price}"
+    return price
+
+
+def prepare_filter_dates(from_date: tuple, to_date: tuple) -> tuple:
     def fn(x):
         return int(x) if x is not None else 0
 

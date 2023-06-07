@@ -3,7 +3,8 @@ LANG_MENU = {
     "tags": "Tags",
     "manage": "Manage",
     "exit": "Exit",
-    "latest": "Latest",
+    "current month": "Current month",
+    "last month": "Last month",
 }
 
 LANG_GENERAL = {

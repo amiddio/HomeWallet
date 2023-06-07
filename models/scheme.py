@@ -1,12 +1,13 @@
 import enum
 
 from typing import Callable, Any
-from sqlalchemy import create_engine, and_, func, Column, Integer, String, Float, DateTime, Enum, Table, ForeignKey, \
-    extract, desc
+from sqlalchemy import (
+    create_engine, and_, func, Column, Integer, String, Float, DateTime, Enum, Table, ForeignKey, extract, desc
+)
 from sqlalchemy.orm import sessionmaker, declarative_base, validates, relationship
+from typing_extensions import Self, Type
 
 from lang_pack.lang import LANG_GENERAL
-from logger.logger import log
 
 engine = create_engine('sqlite:///data/database.db')
 engine.connect()
@@ -16,8 +17,16 @@ session = Session()
 
 
 class General:
+    """
+    Parent class for ORM models
+    """
 
-    def save(self) -> Any:
+    def save(self) -> Self:
+        """
+        Save ORM model
+        :return: Self
+        """
+
         try:
             session.add(self)
             session.commit()
@@ -28,6 +37,10 @@ class General:
             raise Exception(e)
 
     def delete(self) -> bool | None:
+        """
+        Delete ORM model
+        :return: bool | None
+        """
         try:
             session.delete(self)
             session.commit()
@@ -39,13 +52,14 @@ class General:
     @classmethod
     def get_one(cls, filter_: dict[str, int | str]) -> Any:
         """
-        Возвращает объект
-        Примеры для filter_ и order_"
+        Get one ORM
+        Example for filter_ and order_"
         - filter_: {'field1': 3, 'field2': 'some_value'}
         :param filter_: dict
-        :return: Any
+        :return: TagOrm | ValueOrm
         """
         filter_expression = [func.lower(getattr(cls, k)) == func.lower(v) for k, v in filter_.items()]
+        print(type(session.query(cls).filter(and_(*filter_expression)).first()))
         return session.query(cls).filter(and_(*filter_expression)).first()
 
     @classmethod
@@ -55,21 +69,19 @@ class General:
                 tags: list[int] = None,
                 limit: int = None) -> list[Any]:
         """
-        Возвращает список объектов.
-        Примеры для filter_ и order_:
+        Get ORMs
+        Example for filter_ и order_:
         - filter_: {'field1': 3, 'field2': 'some_value'}
         - order_: {'field1': asc, 'field2': desc}
-
         :param filter_: dict = None
         :param order_: dict = None
         :param tags: list[int] = None
         :param limit: int = None
-        :return: list[TagOrm]
+        :return: list[TagOrm | ValueOrm]
         """
 
         query = session.query(cls)
         if filter_:
-            #filter_expression = [func.lower(getattr(cls, k)) == func.lower(v) for k, v in filter_.items()]
             query = query.filter(and_(*filter_))
         if tags:
             query = query.filter(cls.tags.any(TagOrm.id.in_(i for i in tags)))
@@ -80,13 +92,6 @@ class General:
             query = query.limit(limit)
         return query.all()
 
-    # @classmethod
-    # def get_all_tags(cls):
-    #     f = [16]
-    #     query = session.query(cls)
-    #     for i in f:
-    #         query = query.filter(cls.tags.any(id=i))
-    #     return query.all()
 
 Base = declarative_base(cls=General)
 

@@ -1,9 +1,11 @@
 from typing_extensions import Self, Type
-
 from models.scheme import TagOrm, ValueOrm
 
 
 class BaseModel:
+    """
+    Parent class for models
+    """
 
     def get(self) -> Type[TagOrm | ValueOrm]:
         return self.orm
