@@ -1,10 +1,12 @@
 import tkinter as tk
 
 from tkinter import ttk
+from tkinter.ttk import Frame
 from typing import Callable
 from config_data.config import load_config, Config
 from widgets.menu import Menu
 from widgets.tags import Tags
+from widgets.values import Values
 
 
 class App(tk.Tk):
@@ -27,7 +29,8 @@ class App(tk.Tk):
         App._window_styling()
 
         Menu(self)
-        Tags(self)
+        #Tags(self)
+        Values(self)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Public methods
@@ -47,13 +50,47 @@ class App(tk.Tk):
             container.grid_columnconfigure(index, weight=weight)
         return container
 
-    def get_page_header(self, master: tk, title: str, btn_text: str, bg_color: str = None, btn_callback: Callable = None):
+    # def get_page_header(self, master: tk, title: str,
+    #                     btn_text: str = None, bg_color: str = None, btn_callback: Callable = None) -> ttk.Button | None:
+    #     container = self.get_container_frame(master, columns=[10, 1], background=bg_color)
+    #     tk.Label(container, text=title, font=("Calibri", 16, 'bold'), background=bg_color) \
+    #         .grid(row=0, column=0, sticky="w", padx=15, pady=10)
+    #     if btn_text:
+    #         btn = ttk.Button(container, style='Manage.TButton', text=btn_text)
+    #         btn.configure(command=btn_callback)
+    #         btn.grid(row=0, column=1, sticky="e", padx=15, pady=10)
+    #         return btn
+    #     return
+
+    def get_page_header(self, master: tk, title: str,
+                        btn_text: str = None, bg_color: str = None) -> ttk.Button | None:
         container = self.get_container_frame(master, columns=[10, 1], background=bg_color)
         tk.Label(container, text=title, font=("Calibri", 16, 'bold'), background=bg_color) \
             .grid(row=0, column=0, sticky="w", padx=15, pady=10)
-        btn = ttk.Button(container, style='Manage.TButton', text=btn_text, command=btn_callback)
-        btn.grid(row=0, column=1, sticky="e", padx=15, pady=10)
-        return btn
+        if btn_text:
+            btn = ttk.Button(container, style='Manage.TButton', text=btn_text)
+            btn.grid(row=0, column=1, sticky="e", padx=15, pady=10)
+            return btn
+        return
+
+    # def get_filter_header(self, master: tk):
+    #     container = self.get_container_frame(master, columns=[10, 1])
+    #     btn = ttk.Button(container, style='Manage.TButton', text="Filter", command=None)
+    #     btn.grid(row=0, column=1, sticky="e", padx=15, pady=10)
+    #     return btn
+
+    def close_popup_action(self, popup, btn):
+
+        # Set button to normal after popup closed
+        def close_popup():
+            btn.configure(state=tk.NORMAL)
+            popup.destroy()
+
+        # Disabled button after clicked
+        btn.configure(state=tk.DISABLED)
+        popup.protocol('WM_DELETE_WINDOW', close_popup)
+
+        return close_popup
 
     def popup(self, window_title: str, less_by_x: int, less_by_y: int) -> tk.Toplevel:
         popup = tk.Toplevel()
@@ -64,6 +101,18 @@ class App(tk.Tk):
         App._window_ico(popup)
         App._window_styling()
         return popup
+
+    @staticmethod
+    def select_box_filter(container: Frame, data: list, label: str, column: int, selected) -> object:
+        values = tk.StringVar()
+        if selected is not None:
+            values.set(selected)
+        if data:
+            ttk.Label(container, text=label, style='dropdown-label.TLabel')\
+                .grid(row=0, column=column, sticky='w', padx=10, pady=(10, 5))
+            om = tk.OptionMenu(container, values, *data, command=None)
+            om.grid(row=1, column=column, sticky='w', padx=10, pady=(5, 10))
+        return values
 
     # ------------------------------------------------------------------------------------------------------------------
     # Private methods

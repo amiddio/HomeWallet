@@ -1,9 +1,11 @@
 import enum
 
 from typing import Callable, Any
-from sqlalchemy import create_engine, and_, func, Column, Integer, String, Float, DateTime, Enum, Table, ForeignKey
+from sqlalchemy import create_engine, and_, func, Column, Integer, String, Float, DateTime, Enum, Table, ForeignKey, \
+    extract, desc
 from sqlalchemy.orm import sessionmaker, declarative_base, validates, relationship
 
+from lang_pack.lang import LANG_GENERAL
 from logger.logger import log
 
 engine = create_engine('sqlite:///data/database.db')
@@ -49,7 +51,9 @@ class General:
     @classmethod
     def get_all(cls,
                 filter_: dict[str, int | str] = None,
-                order_: dict[str, Callable] = None) -> list[Any]:
+                order_: dict[str, Callable] = None,
+                tags: list[int] = None,
+                limit: int = None) -> list[Any]:
         """
         Возвращает список объектов.
         Примеры для filter_ и order_:
@@ -58,18 +62,31 @@ class General:
 
         :param filter_: dict = None
         :param order_: dict = None
+        :param tags: list[int] = None
+        :param limit: int = None
         :return: list[TagOrm]
         """
 
         query = session.query(cls)
         if filter_:
-            filter_expression = [func.lower(getattr(cls, k)) == func.lower(v) for k, v in filter_.items()]
-            query = query.filter(and_(*filter_expression))
+            #filter_expression = [func.lower(getattr(cls, k)) == func.lower(v) for k, v in filter_.items()]
+            query = query.filter(and_(*filter_))
+        if tags:
+            query = query.filter(cls.tags.any(TagOrm.id.in_(i for i in tags)))
         if order_:
             order_expression = [fn(getattr(cls, field)) for field, fn in order_.items()]
             query = query.order_by(*order_expression)
+        if limit:
+            query = query.limit(limit)
         return query.all()
 
+    # @classmethod
+    # def get_all_tags(cls):
+    #     f = [16]
+    #     query = session.query(cls)
+    #     for i in f:
+    #         query = query.filter(cls.tags.any(id=i))
+    #     return query.all()
 
 Base = declarative_base(cls=General)
 
@@ -97,8 +114,8 @@ class TagOrm(Base):
 
 
 class TypeEnum(enum.Enum):
-    VIN = 'VIN'
-    VOUT = 'VOUT'
+    VIN = LANG_GENERAL["income"]
+    VOUT = LANG_GENERAL["expense"]
 
 
 class ValueOrm(Base):
@@ -108,7 +125,7 @@ class ValueOrm(Base):
     message = Column(String(10000), name='message')
     price_usd = Column(Float, name='price_usd')
     price_gel = Column(Float, name='price_gel')
-    date = Column(DateTime, default=func.now())
+    date = Column(DateTime, name='date')
     tags = relationship('TagOrm', secondary=values_tags, lazy=True)
 
     @validates('message')
@@ -120,13 +137,12 @@ class ValueOrm(Base):
     def __repr__(self) -> str:
         return "ValueOrm({id}, {type}, {date})".format(id=self.id, type=self.type, date=self.date)
 
+    @classmethod
+    def get_years_range(cls) -> list:
+        return session.query(extract('year', getattr(cls, 'date')).label('year')) \
+                        .distinct().order_by(desc('year')).all()
+
 
 def init_db():
     Base.metadata.create_all(engine)
 
-# tags = TagOrm.get_all()
-# val = ValueOrm.get_one(iid=1)
-# val.tags.append(tags[0])  # Add tag
-# val.tags = []  # Delete all tags
-# val.tags.remove(tags[0])  # Revove one tag
-# val.save()

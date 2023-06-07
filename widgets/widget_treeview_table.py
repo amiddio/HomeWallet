@@ -9,9 +9,10 @@ class WidgetTreeviewTable:
     scrollbar: tk.Scrollbar = None
     treeview: ttk.Treeview = None
 
-    def __init__(self, root: tk, columns: tuple, rows: list, callbacks: dict = None) -> None:
+    def __init__(self, root: tk, columns: tuple, columns_width: tuple, rows: list, callbacks: dict = None) -> None:
         self.root = root
         self.columns = columns
+        self.columns_width = columns_width
         self.rows = rows
         self.callbacks = callbacks
 
@@ -44,8 +45,8 @@ class WidgetTreeviewTable:
                 self.treeview.menu.add_command(label=k.capitalize(), command=partial(v, self.treeview))
 
         # Define headings and columns
-        for i, item in enumerate(self.columns, 1):
-            self.treeview.column(f"# {i}", width=30 if i > 1 else 150)
+        for i, (item, width) in enumerate(zip(self.columns, self.columns_width), 1):
+            self.treeview.column(f"# {i}", width=width)
             self.treeview.heading(item, text=item.capitalize(), anchor='w')
 
         # Display widget

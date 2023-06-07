@@ -1,4 +1,6 @@
 from typing import Callable
+
+from sqlalchemy import asc
 from typing_extensions import Self
 from models.base_model import BaseModel
 from models.scheme import TagOrm
@@ -34,3 +36,15 @@ class TagModel(BaseModel):
     def get_all(filter_: dict[str, int | str] = None, order_: dict[str, Callable] = None) -> list[Self]:
         tags = TagOrm.get_all(filter_, order_)
         return [TagModel(orm=orm) for orm in tags]
+
+    @staticmethod
+    def get_checked_tags(checkboxed: list[int]):
+        result = []
+        if not checkboxed:
+            return result
+        for i, tag in zip(checkboxed, TagModel.get_all(order_={'name': asc})):
+            if i.get() > 0:
+                result.append(tag.get())
+        return result
+
+

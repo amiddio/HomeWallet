@@ -5,7 +5,6 @@ from functools import partial
 from tkinter import ttk
 from typing import Callable
 from sqlalchemy import asc
-
 from lang_pack.lang import LANG_GENERAL, LANG_COLORS, LANG_MSG
 from logger.logger import log
 from models.tag_model import TagModel
@@ -33,8 +32,9 @@ class Tags:
         # Add page header
         self.btn_add = self.root.get_page_header(
             self.root, title=LANG_GENERAL["tags"], btn_text=LANG_GENERAL["add"],
-            bg_color=LANG_COLORS["header_bg"], btn_callback=self.open_popup
+            bg_color=LANG_COLORS["header_bg"]
         )
+        self.btn_add.configure(command=self.open_popup)
 
         # Create treeview
         self.tags_treevew()
@@ -63,10 +63,11 @@ class Tags:
         popup.protocol('WM_DELETE_WINDOW', close_popup)
 
         # Add popup header
-        self.root.get_page_header(
+        btn = self.root.get_page_header(
             popup, title=LANG_GENERAL["add tag"], btn_text=LANG_GENERAL["save"],
-            bg_color=LANG_COLORS["header_bg"], btn_callback=partial(self.save_tag, close_popup, iid)
+            bg_color=LANG_COLORS["header_bg"]
         )
+        btn.configure(command=partial(self.save_tag, close_popup, iid))
         # Add name entry
         self.entry_name = WidgetEntryFormRow(
             root=self.root, popup=popup, label=LANG_GENERAL["tag name"], is_focus=True,
@@ -124,6 +125,7 @@ class Tags:
 
         # Prepare data to treeview
         columns = (LANG_GENERAL["tag name"],)
+        columns_width = (500, )
         data = []
         for tag in TagModel.get_all(order_={'name': asc}):
             data.append((tag.get().id, tag.get().name))
@@ -134,7 +136,9 @@ class Tags:
 
         # Create treeview
         WidgetTreeviewTable.destroy(self.treeview, self.scrollbar)
-        trv = WidgetTreeviewTable(root=self.root, columns=columns, rows=data, callbacks=callbacks)
+        trv = WidgetTreeviewTable(
+            root=self.root, columns=columns, columns_width=columns_width, rows=data, callbacks=callbacks
+        )
         self.treeview, self.scrollbar = trv()
 
     def treeview_submenu_edit(self, tv: ttk.Treeview) -> None:

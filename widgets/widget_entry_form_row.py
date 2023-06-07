@@ -17,10 +17,10 @@ class WidgetEntryFormRow:
         """
 
         # Created conteiner
-        container = self.root.get_container_frame(self.popup, columns=[1, 4])
+        container = self.root.get_container_frame(self.popup, columns=[1, 10])
 
         # Created Label
-        tk.Label(container, text=self.label).grid(row=0, column=0, sticky="w", padx=10, pady=10)
+        tk.Label(container, text=self.label, width=20).grid(row=0, column=0, sticky='w', padx=10, pady=10)
 
         # Created Entry
         entry = tk.Entry(
