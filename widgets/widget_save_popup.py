@@ -6,6 +6,7 @@ from typing import Callable
 from lang_pack.lang import LANG_GENERAL, LANG_COLORS
 from models.scheme import TypeEnum
 from models.value_model import ValueModel
+from parser.currency.pokur import Pokur
 from widgets.widget_checkbutton_form_row import WidgetCheckbuttonFormRow
 from widgets.widget_entry_form_row import WidgetEntryFormRow
 from widgets.widget_selectbox_form_row import WidgetSelectboxFormRow
@@ -77,3 +78,28 @@ class WidgetSavePopup:
         ValuesStore.tags = WidgetCheckbuttonFormRow(
             root=self.master, popup=popup, checked=self.value.get().tags if self.value else None
         )()
+
+        def _set_currency_get_to_usd(event):
+            value = ValuesStore.price_gel.get().strip()
+            if self.value or not value or ValuesStore.price_usd.get():
+                return
+            factor = Pokur().parse_gel_usd()
+            if factor:
+                ValuesStore.price_usd.configure(
+                    textvariable=tk.StringVar(value=str(Pokur.currency_convert(value=float(value), factor=factor)))
+                )
+
+        def _set_currency_usd_to_gel(event):
+            value = ValuesStore.price_usd.get().strip()
+            if self.value or not value or ValuesStore.price_gel.get():
+                return
+            factor = Pokur().parse_usd_gel()
+            if factor:
+                ValuesStore.price_gel.configure(
+                    textvariable=tk.StringVar(value=str(Pokur.currency_convert(value=float(value), factor=factor)))
+                )
+
+        ValuesStore.price_gel.bind('<FocusOut>', _set_currency_get_to_usd)
+        ValuesStore.price_usd.bind('<FocusOut>', _set_currency_usd_to_gel)
+
+
