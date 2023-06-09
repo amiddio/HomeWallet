@@ -59,7 +59,6 @@ class General:
         :return: TagOrm | ValueOrm
         """
         filter_expression = [func.lower(getattr(cls, k)) == func.lower(v) for k, v in filter_.items()]
-        print(type(session.query(cls).filter(and_(*filter_expression)).first()))
         return session.query(cls).filter(and_(*filter_expression)).first()
 
     @classmethod
