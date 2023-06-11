@@ -7,6 +7,7 @@ from lang_pack.lang import LANG_GENERAL, LANG_COLORS
 from models.scheme import TypeEnum
 from models.value_model import ValueModel
 from parser.currency.pokur import Pokur
+from widgets.widget_calendar_popup import WidgetCalendarPopup
 from widgets.widget_checkbutton_form_row import WidgetCheckbuttonFormRow
 from widgets.widget_entry_form_row import WidgetEntryFormRow
 from widgets.widget_selectbox_form_row import WidgetSelectboxFormRow
@@ -101,5 +102,7 @@ class WidgetSavePopup:
 
         ValuesStore.price_gel.bind('<FocusOut>', _set_currency_get_to_usd)
         ValuesStore.price_usd.bind('<FocusOut>', _set_currency_usd_to_gel)
+        ValuesStore.date.bind('<Button-1>', WidgetCalendarPopup(popup, ValuesStore.date))
+
 
 
