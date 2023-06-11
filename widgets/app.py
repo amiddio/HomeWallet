@@ -2,6 +2,8 @@ import tkinter as tk
 
 from tkinter import ttk
 from tkinter.ttk import Frame
+from typing import Callable
+
 from config_data.config import load_config, Config
 from widgets.menu import Menu
 from widgets.values import Values, ViewMonth
@@ -26,14 +28,16 @@ class App(tk.Tk):
         App._window_ico(self)
         App._window_styling()
 
+        # Created menu
         Menu(self)
+        # Opened values widget
         Values(self, view_month=ViewMonth.CURRENT)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Public methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def clear_window(self):
+    def clear_window(self) -> None:
         for widget in self.winfo_children():
             if not isinstance(widget, tk.Menu):
                 widget.destroy()
@@ -58,7 +62,7 @@ class App(tk.Tk):
             return btn
         return
 
-    def close_popup_action(self, popup, btn):
+    def close_popup_action(self, popup: tk.Toplevel, btn: ttk.Button) -> Callable:
 
         # Set button to normal after popup closed
         def close_popup():
@@ -82,7 +86,9 @@ class App(tk.Tk):
         return popup
 
     @staticmethod
-    def select_box_filter(container: Frame, data: list, label: str, column: int, selected) -> object:
+    def select_box_filter(
+            container: Frame, data: list[str | int], label: str, column: int, selected: str | int
+    ) -> tk.StringVar:
         values = tk.StringVar()
         if selected is not None:
             values.set(selected)

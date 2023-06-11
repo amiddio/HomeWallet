@@ -37,6 +37,7 @@ LANG_GENERAL = {
     "from": "From:",
     "to": "To:",
     "submit": "Submit",
+    "select": "Select",
 }
 
 LANG_MSG = {

@@ -9,8 +9,23 @@ from models.tag_model import TagModel
 from models.value_model import ValueModel
 
 
+def get_year_month_day(date_string: str) -> tuple[int, int, int]:
+    """
+    Get year, month, day from string date.
+    If attribute is empty returned current year, month, day
+    :param date_string: str
+    :return: tuple[int, int, int]
+    """
+    if date_string and isinstance(date_string, str):
+        result = datetime.strptime(date_string, '%Y-%m-%d')
+        return result.year, result.month, result.day
+    else:
+        return datetime.today().year, datetime.today().month, datetime.today().day
+
+
 def date_formated(dt):
     return dt.strftime('%d %B, %Y')
+
 
 def get_last_month():
     previous_year = datetime.now().year
@@ -20,6 +35,7 @@ def get_last_month():
         previous_year -= 1
 
     return previous_year, previous_month
+
 
 def display_price(price, type_=None):
     if not price:
