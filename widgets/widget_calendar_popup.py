@@ -21,6 +21,12 @@ class WidgetCalendarPopup:
         def on_closing() -> None:
             try:
                 popup.destroy()
+            except Exception as e:
+                log().error(e)
+
+        def on_selecting() -> None:
+            try:
+                popup.destroy()
                 self.date.configure(textvariable=tk.StringVar(value=str(cal.selection_get())))
             except Exception as e:
                 log().error(e)
@@ -36,7 +42,7 @@ class WidgetCalendarPopup:
         cal.grid(row=0, column=0, padx=0, pady=0)
         # Created select button
         btn = ttk.Button(popup, style='Manage.TButton', text=LANG_GENERAL["select"], width=10)
-        btn.configure(command=on_closing)
+        btn.configure(command=on_selecting)
         btn.grid(row=1, column=0, padx=0, pady=10)
 
     def _window_geometry(self, window: tk) -> None:
